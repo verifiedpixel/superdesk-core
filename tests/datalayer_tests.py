@@ -20,7 +20,7 @@ class DatalayerTestCase(TestCase):
     def test_find_all(self):
         data = {'resource': 'test', 'action': 'get'}
         superdesk.get_resource_service('activity').post([data])
-        self.assertEquals(1, superdesk.get_resource_service('activity').get(req=None, lookup={}).count())
+        self.assertEqual(1, superdesk.get_resource_service('activity').get(req=None, lookup={}).count())
 
     def test_json_encoder(self):
         _id = ObjectId()
@@ -29,3 +29,13 @@ class DatalayerTestCase(TestCase):
         self.assertIn('"name": "foo"', text)
         self.assertIn('"group": null', text)
         self.assertIn('"_id": "%s"' % (_id, ), text)
+
+    def test_find_with_mongo_query(self):
+        service = superdesk.get_resource_service('activity')
+        service.post([
+            {'resource': 'foo', 'action': 'get'},
+            {'resource': 'bar', 'action': 'post'},
+        ])
+
+        self.assertEqual(1, service.find({'resource': {'$in': ['foo']}}).count())
+        self.assertEqual(1, service.find({}, max_results=1).count(True))

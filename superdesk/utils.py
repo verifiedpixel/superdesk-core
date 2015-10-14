@@ -35,6 +35,31 @@ class SortOrder(Enum):
     desc = 2
 
 
+class SuperdeskBaseEnum(Enum):
+    """
+    Base enum
+    """
+    @classmethod
+    def from_value(cls, value):
+        """
+        Returns the valid enum if value found else none
+        :param value: enum value
+        :return: return valid
+        """
+        try:
+            return cls(value)
+        except ValueError:
+            return None
+
+    @classmethod
+    def values(cls):
+        """
+        Returns list of values for an enum
+        :return: list of values for an enum
+        """
+        return [enum_member.value for enum_member in cls]
+
+
 def get_random_string(length=12):
     return str(uuid4())
 

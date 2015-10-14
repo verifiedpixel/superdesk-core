@@ -25,7 +25,8 @@ class IptcTestCase(TestCase):
     parser = Iptc7901FileParser()
 
     def open(self, filename):
-        return self.parser.parse_file(fixture(filename))
+        provider = {'name': 'Test'}
+        return self.parser.parse_file(fixture(filename), provider)
 
     def test_open_iptc7901_file(self):
         with self.app.app_context():
@@ -37,5 +38,20 @@ class IptcTestCase(TestCase):
             self.assertEqual('Germany Social Democrats: Coalition talks with Merkel could fail =', item['headline'])
             self.assertRegex(item['body_html'], '^\n   Berlin')
             self.assertEqual('Germany-politics', item['slugline'])
-            self.assertEquals('R', item['priority'])
-            self.assertEquals([{'qcode': 'i'}], item['anpa_category'])
+            self.assertEqual(5, item['priority'])
+            self.assertEqual([{'qcode': 'i'}], item['anpa_category'])
+            self.assertTrue(item['ednote'].find('## Editorial contacts'))
+
+    def test_open_iptc7901_file_odd_charset(self):
+        with self.app.app_context():
+            item = self.open('IPTC7901_odd_charset.txt')
+            self.assertTrue(item['body_html'].find('Müller'))
+            self.assertTrue(item['ednote'].find('## Editorial contacts'))
+
+    def test_map_priority(self):
+        self.assertEqual(1, self.parser.map_priority("1"))
+        self.assertEqual(2, self.parser.map_priority("2"))
+        self.assertEqual(3, self.parser.map_priority("3"))
+        self.assertEqual(5, self.parser.map_priority("5"))
+        self.assertEqual(5, self.parser.map_priority("eee"))
+        self.assertEqual(5, self.parser.map_priority(None))

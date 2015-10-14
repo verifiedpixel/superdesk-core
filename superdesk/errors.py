@@ -25,16 +25,16 @@ def add_notifier(notifier):
 
 
 def update_notifiers(*args, **kwargs):
-        for notifier in notifiers:
-            notifier(*args, **kwargs)
+    for notifier in notifiers:
+        notifier(*args, **kwargs)
 
 
 def get_registered_errors(self):
-        return {
-            'IngestApiError': IngestApiError._codes,
-            'IngestFtpError': IngestFtpError._codes,
-            'IngestFileError': IngestFileError._codes
-        }
+    return {
+        'IngestApiError': IngestApiError._codes,
+        'IngestFtpError': IngestFtpError._codes,
+        'IngestFileError': IngestFileError._codes
+    }
 
 
 class SuperdeskError(ValidationError):
@@ -380,8 +380,7 @@ class SuperdeskPublishError(SuperdeskError):
         super().__init__(code)
         self.system_exception = exception
         destination = destination or {}
-        self.destination_name = destination.get('name', 'Unknown destination') \
-            if destination else 'Unknown destination'
+        self.destination_name = destination.get('name', 'Unknown destination') if destination else 'Unknown destination'
 
         if exception:
             exception_msg = str(exception)[-200:]
@@ -540,11 +539,11 @@ class PublishFileError(SuperdeskPublishError):
         return PublishFileError(13000, exception, destinations)
 
 
-class PublishPublicAPIError(SuperdeskPublishError):
+class PublishHTTPPushError(SuperdeskPublishError):
     _codes = {
-        14000: "Public API publish error",
+        14000: "HTTP push publish error",
     }
 
     @classmethod
-    def publicAPIError(cls, exception=None, destination=None):
-        return PublishPublicAPIError(14000, exception, destination)
+    def httpPushError(cls, exception=None, destination=None):
+        return PublishHTTPPushError(14000, exception, destination)
